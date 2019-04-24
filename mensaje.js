@@ -6,6 +6,7 @@ module.exports = Object.freeze({
 
 	NOMBRE_REQUERIDO 	  	  : 'El nombre es un campo requerido',
 	NOMBRE_MIN_LENGTH_3 	  : 'El nombre debe tener al menos 3 caracteres',
+	PARAMETRO_ID_INCORRECTO   : 'El parámetro indicado es incorrecto',
 
 
 	EDITORIAL_NO_ENCONTRADA   : 'Editorial no encontrada',

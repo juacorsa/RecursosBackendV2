@@ -5,7 +5,7 @@ const Tema = require('../models/tema');
 const Mensaje = require('../mensaje');
 
 exports.obtenerTemas = async (req, res, next) => { 
-	let ordenarPor;
+	let ordenarPor = 'nombre';
 	
 	if (req.query.sortBy) {
 		const split = req.query.sortBy.split(':');					
@@ -26,7 +26,7 @@ exports.obtenerTemas = async (req, res, next) => {
 exports.obtenerTema = async (req, res, next) => { 
 	const id = req.params.id;
 	const tema = await Tema.findById(id);
-
+	
 	try {
 		if (!tema) {
       		const error = new Error(Mensaje.TEMA_NO_ENCONTRADO);
@@ -38,7 +38,7 @@ exports.obtenerTema = async (req, res, next) => {
 	} catch(err) {
 		err.statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
     	next(err);
-	}    
+	} 
 };
 
 exports.registrarTema =  async (req, res, next) => { 
@@ -77,7 +77,7 @@ exports.actualizarTema = async (req, res, next) => {
 		return res.status(HttpStatus.BAD_REQUEST).json({ msg: Mensaje.TEMA_YA_EXISTE });
   
   	try {
-  		const tema = await Tema.findByIdAndUpdate(id, { nombre }, { new: true });
+  		const tema = await Tema.findByIdAndUpdate(id, { nombre }, { new: true });		
   		if (!tema) 
   			return res.status(HttpStatus.NOT_FOUND).json({ msg: Mensaje.TEMA_NO_ENCONTRADO });
 		

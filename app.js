@@ -26,10 +26,17 @@ app.use((error, req, res, next) => {
 });
 
 
+let MONGO_URI;
+
+if (process.env.NODE_ENV == 'test')
+  MONGO_URI = 'mongodb://localhost:27017/recursos';
+
+else
+  MONGO_URI = `mongodb://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@ds153763.mlab.com:53763/${process.env.MONGO_DATABASE}`;
+
+
 const PORT = process.env.PORT || 5000;
-
-
-mongoose.connect(MONGO_URI, { useNewUrlParser: true })
+mongoose.connect(MONGO_URI, { useNewUrlParser: true, useFindAndModify: false })
 	.then(() => {
 		console.log('Conectado a MongoDB con éxito ....');
 		app.listen(PORT);
@@ -39,6 +46,4 @@ mongoose.connect(MONGO_URI, { useNewUrlParser: true })
 		process.exit(1);
 	});	
 
-
-
-
+  module.exports = app;
