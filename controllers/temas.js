@@ -28,11 +28,9 @@ exports.obtenerTema = async (req, res, next) => {
 	const tema = await Tema.findById(id);
 	
 	try {
-		if (!tema) {
-      		const error = new Error(Mensaje.TEMA_NO_ENCONTRADO);
-      		error.statusCode = HttpStatus.NOT_FOUND;
-      		throw error;
-    	}
+		if (!tema) 
+      		return res.status(HttpStatus.NOT_FOUND).json({ msg: Mensaje.TEMA_NO_ENCONTRADO });    	
+
 		res.status(HttpStatus.OK).json({tema});
 
 	} catch(err) {

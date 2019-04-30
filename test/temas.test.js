@@ -27,6 +27,9 @@ describe('api/temas', function() {
 			const res = await chai.request(app).get('/api/temas');
 
 	    	expect(res).to.have.status(HttpStatus.OK);
+	    	expect(res.body).to.be.an('object');
+	    	expect(res.body).to.have.property('total').equal(2);
+	    	expect(res.body).to.have.property('temas');
 	  	});
 	});
 
@@ -35,23 +38,26 @@ describe('api/temas', function() {
 			const tema = new Tema({ nombre: 'tema1' });
 			await tema.save();			
 
-			await chai.request(app).get('/api/temas/' + tema._id);
+			const res = await chai.request(app).get('/api/temas/' + tema._id);
 
 			expect(tema).to.not.be.null;
+			expect(res.body).to.be.an('object');			
+			expect(res).to.have.status(HttpStatus.OK);			
 		});
 
-		it('devuelve un error 404 si le pasamos un id no válido', async () => {
+		it('devuelve un error 404 si le pasamos un id de tema que no existe', async () => {
 			const res = await chai.request(app).get('/api/temas/1');
 
 			expect(res).to.have.status(HttpStatus.NOT_FOUND);
 			expect(res.body).to.have.property('msg').equal(Mensaje.PARAMETRO_ID_INCORRECTO);
 		});
 
-		it('devuelve un error 500 si le pasamos un id no válido', async () => {
+		it('devuelve un error 404 si le pasamos un id no válido', async () => {
 			const id  = mongoose.Types.ObjectId();
 			const res = await chai.request(app).get('/api/temas/' + id);
 
-			expect(res).to.have.status(HttpStatus.INTERNAL_SERVER_ERROR);			
+			expect(res).to.have.status(HttpStatus.NOT_FOUND);			
+			expect(res.body).to.have.property('msg').equal(Mensaje.TEMA_NO_ENCONTRADO);
 		});
 	});
 
