@@ -65,7 +65,7 @@ describe('api/temas', function() {
 		let nombre;
 
 		const exec = async () => {
-			return await chai.request(app).post('/api/temas/').send({ nombre });
+			return await chai.request(app).post('/api/temas').send({ nombre });
 		}		
 
 		beforeEach(() => {      		

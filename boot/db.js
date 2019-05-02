@@ -1,11 +1,12 @@
 const mongoose = require('mongoose');
 
+require('dotenv').config()
+
 module.exports = function(app) {
 	let MONGO_URI;
 
 	if (process.env.NODE_ENV == 'test')
-	  MONGO_URI = 'mongodb://localhost:27017/recursos';
-
+	  MONGO_URI = process.env.MONGO_DATABASE_TEST;
 	else
 	  MONGO_URI = `mongodb://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@ds153763.mlab.com:53763/${process.env.MONGO_DATABASE}`;
 

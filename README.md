@@ -1,6 +1,14 @@
 # Backend Recursos NodeJS + Express + MongoDB - Versión 2
 
 
+### Commit 3 - 02-05-2019
+* Se crea el controlador de los fabricantes.
+* Se crean las rutas y controladores de los fabricantes.
+* Se crean los tests de los fabricantes.
+* Se crea el fichero boot/config.js para la configuración de la aplicación.
+* Se instala dotenv (npm i dotenv) y se crea el fichero.env con las variables de entorno.
+
+
 ### Commit 2 - 30-04-2019
 * Se crea el fichero nodemon.json con las variables de entorno de la cadena de conexión.
 * Se modifica el package.json para crear el script "dev".
