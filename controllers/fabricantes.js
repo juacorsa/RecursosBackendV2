@@ -85,4 +85,3 @@ exports.actualizarFabricante = async (req, res, next) => {
     	next(err);
 	}	  	
 };
-

@@ -2,27 +2,26 @@ const HttpStatus = require('http-status-codes');
 const mongoose = require('mongoose');
 const chai = require('chai');
 const expect = require('chai').expect;
-const Fabricante = require('../models/fabricante');
+const Editorial = require('../models/editorial');
 const Mensaje = require('../mensaje');
 
 chai.use(require('chai-http'));
 
 const app = require('../app.js'); 
-const url = '/api/fabricantes/';
+const url = '/api/editoriales/';
 
-describe('api/fabricantes', function() {
-
+describe('api/editoriales', function() {
  	afterEach(async () => {
-		await Fabricante.deleteMany({});
+		await Editorial.deleteMany({});
   	});
 
 	describe('GET /', () => {
-		it('debe devolver todos los fabricantes', async () => {
-			await Fabricante.deleteMany({});
+		it('debe devolver todas las editoriales', async () => {	
+			await Editorial.deleteMany({});	
 
-			Fabricante.collection.insertMany([
-				{ nombre: 'fabricante1' },
-				{ nombre: 'fabricante2' }
+			Editorial.collection.insertMany([
+				{ nombre: 'editorial1' },
+				{ nombre: 'editorial2' }
 			]);
 
 			const res = await chai.request(app).get(url);
@@ -30,24 +29,24 @@ describe('api/fabricantes', function() {
 	    	expect(res).to.have.status(HttpStatus.OK);
 	    	expect(res.body).to.be.an('object');
 	    	expect(res.body).to.have.property('total').equal(2);
-	    	expect(res.body).to.have.property('fabricantes');
+	    	expect(res.body).to.have.property('editoriales');
 	  	});
 	});
 
 	describe('GET /:id', () => {
-		it('devuelve un fabricante si le pasamos un id válido', async () => {
-			const fabricante = new Fabricante({ nombre: 'fabricante1' });
-			await fabricante.save();			
+		it('devuelve una editorial si le pasamos un id válido', async () => {
+			const editorial = new Editorial({ nombre: 'editorial1' });
+			await editorial.save();			
 			
-			const res = await chai.request(app).get(url + fabricante._id);
+			const res = await chai.request(app).get(url + editorial._id);
 
-			expect(fabricante).to.not.be.null;
+			expect(editorial).to.not.be.null;
 			expect(res.body).to.be.an('object');			
 			expect(res).to.have.status(HttpStatus.OK);			
 		});
 
-		it('devuelve un error 404 si le pasamos un id de fabricante que no existe', async () => {
-			const res = await chai.request(app).get(url + '/1');
+		it('devuelve un error 404 si le pasamos un id de editorial que no existe', async () => {
+			const res = await chai.request(app).get(url + '1');
 
 			expect(res).to.have.status(HttpStatus.NOT_FOUND);
 			expect(res.body).to.have.property('msg').equal(Mensaje.PARAMETRO_ID_INCORRECTO);
@@ -58,7 +57,7 @@ describe('api/fabricantes', function() {
 			const res = await chai.request(app).get(url + id);
 
 			expect(res).to.have.status(HttpStatus.NOT_FOUND);			
-			expect(res.body).to.have.property('msg').equal(Mensaje.FABRICANTE_NO_ENCONTRADO);
+			expect(res.body).to.have.property('msg').equal(Mensaje.EDITORIAL_NO_ENCONTRADA);
 		});
 	});
 
@@ -70,10 +69,10 @@ describe('api/fabricantes', function() {
 		}		
 
 		beforeEach(() => {      		
-      		nombre = 'fabricante1'; 
+      		nombre = 'editorial1'; 
     	})
 
-		it('devuelve un error 422 si el nombre del fabricante es inferior a 3 caracteres', async () => {
+		it('devuelve un error 422 si el nombre de la editorial es inferior a 3 caracteres', async () => {
 			nombre = new Array(2).join('a');
 			const res = await exec();
 			
@@ -81,7 +80,7 @@ describe('api/fabricantes', function() {
 			expect(res.body).to.be.an('object').to.have.property('errors');
 		});
 
-		it('devuelve un error 422 si el nombre del fabricante es vacío', async () => {
+		it('devuelve un error 422 si el nombre de la editorial es vacía', async () => {
 			nombre = '';
 			const res = await exec();
 			
@@ -89,43 +88,43 @@ describe('api/fabricantes', function() {
 			expect(res.body).to.be.an('object').to.have.property('errors');
 		});
 
-		it('devuelve un estado 201 si el registro del fabricante es correcto', async () => {			
+		it('devuelve un estado 201 si el registro de la editorial es correcto', async () => {			
 			const res = await exec();
 			
 			expect(res).to.have.status(HttpStatus.CREATED);	
 			expect(res).to.be.json;		
-			expect(res.body).to.have.property('msg').equal(Mensaje.FABRICANTE_REGISTRADO);	
+			expect(res.body).to.have.property('msg').equal(Mensaje.EDITORIAL_REGISTRADA);	
 			expect(res.body).to.be.an('object').to.have.property('msg');			
-			expect(res.body).to.be.an('object').to.have.property('fabricante');
+			expect(res.body).to.be.an('object').to.have.property('editorial');
 		});
 
-		it('devuelve un error 400 si registramos un fabricante existente', async () => {			
+		it('devuelve un error 400 si registramos una editorial existente', async () => {			
 			await exec();
 			res = await exec(); 			
 			
 			expect(res).to.have.status(HttpStatus.BAD_REQUEST);			
-			expect(res.body).to.have.property('msg').equal(Mensaje.FABRICANTE_YA_EXISTE);				
+			expect(res.body).to.have.property('msg').equal(Mensaje.EDITORIAL_YA_EXISTE);				
 		});
 	});
 
 	describe('PUT /', () => {
 		let nombreActualizado;
 		let id;
-		let fabricante;
+		let editorial;
 
     	const exec = async () => {
       		return await chai.request(app).put(url + id).send({ nombre: nombreActualizado });
     	}
 
     	beforeEach(async () => {     
-        	fabricante = new Fabricante({ nombre: 'fabricante1' });
-      		await fabricante.save();      
+        	editorial = new Editorial({ nombre: 'editorial1' });
+      		await editorial.save();      
       
-      		id = fabricante._id; 	
-      		nombreActualizado = 'fabricanteActualizado'; 
+      		id = editorial._id; 	
+      		nombreActualizado = 'editorialActualizada'; 
     	})
 
-		it('devuelve un error 422 si el nombre del fabricante es inferior a 3 caracteres', async () => {
+		it('devuelve un error 422 si el nombre de la editorial es inferior a 3 caracteres', async () => {
 			nombreActualizado = new Array(2).join('a');
 			const res = await exec();
 			
@@ -133,7 +132,7 @@ describe('api/fabricantes', function() {
 			expect(res.body).to.be.an('object').to.have.property('errors');			
 		});
 
-		it('devuelve un error 422 si el nombre del fabricante es vacío', async () => {
+		it('devuelve un error 422 si el nombre de la editorial es vacío', async () => {
 			nombreActualizado = '';
 			const res = await exec();
 			
@@ -141,23 +140,23 @@ describe('api/fabricantes', function() {
 			expect(res.body).to.be.an('object').to.have.property('errors');
 		});
 
-		it('devuelve un estado 200 si el registro del fabricante es correcto', async () => {			
-			nombreActualizado = 'fabricanteActualizado';
+		it('devuelve un estado 200 si el registro de la editorial es correcto', async () => {			
+			nombreActualizado = 'editorialActualizada';
 			const res = await exec();
 			
 			expect(res).to.have.status(HttpStatus.OK);	
 			expect(res).to.be.json;		
-			expect(res.body).to.have.property('msg').equal(Mensaje.FABRICANTE_ACTUALIZADO);	
+			expect(res.body).to.have.property('msg').equal(Mensaje.EDITORIAL_ACTUALIZADA);	
 			expect(res.body).to.be.an('object').to.have.property('msg');
-			expect(res.body).to.be.an('object').to.have.property('fabricante');
+			expect(res.body).to.be.an('object').to.have.property('editorial');
 		});
 
-		it('devuelve un error 400 si actualizamos un fabricante existente', async () => {			
-			nombreActualizado = 'fabricante1';
+		it('devuelve un error 400 si actualizamos una editorial existente', async () => {			
+			nombreActualizado = 'editorial1';
 			res = await exec(); 			
 			
 			expect(res).to.have.status(HttpStatus.BAD_REQUEST);			
-			expect(res.body).to.have.property('msg').equal(Mensaje.FABRICANTE_YA_EXISTE);				
+			expect(res.body).to.have.property('msg').equal(Mensaje.EDITORIAL_YA_EXISTE);				
 		});
 	});
 });
