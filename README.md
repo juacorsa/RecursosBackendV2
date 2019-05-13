@@ -1,21 +1,24 @@
 # Backend Recursos NodeJS + Express + MongoDB - Versión 2
 
 
-### Commit 4 - 06-05-2019
+### Commit 5
+* Se continua con los tests de enlaces.
+
+### Commit 4
 * Se crea el controlador de las editoriales.
 * Se crean las rutas y controladores de las editoriales.
 * Se crean los tests de las editoriales.
 * Se crean los tests de los idiomas.
 * Se crean las rutas y controladores de los idiomas.
 
-### Commit 3 - 02-05-2019
+### Commit 3
 * Se crea el controlador de los fabricantes.
 * Se crean las rutas y controladores de los fabricantes.
 * Se crean los tests de los fabricantes.
 * Se crea el fichero boot/config.js para la configuración de la aplicación.
 * Se instala dotenv (npm i dotenv) y se crea el fichero .env con las variables de entorno.
 
-### Commit 2 - 30-04-2019
+### Commit 2
 * Se crea el fichero nodemon.json con las variables de entorno de la cadena de conexión.
 * Se modifica el package.json para crear el script "dev".
 * Se crear el middleware validateId para controlar que los parámetros de las rutas get y put sea correcto.
@@ -26,7 +29,7 @@
 * Se instala helmet (npm i helmet)
 * Se instala morgan (npm i morgan)
 
-### Commit 1 - 22-04-2019
+### Commit 1
 * Se inicia el proyecto con npm init -y.
 * Se crean las carpetas controllers, routes, models y middlewares.
 * Se instalan las dependencias express, mongoose, nodemon, body-parser, express-validator y http-status-codes.
