@@ -1,5 +1,7 @@
 # Backend Recursos NodeJS + Express + MongoDB - Versión 2
 
+### Commit 6
+* Se terminan los tests de enlaces.
 
 ### Commit 5
 * Se continua con los tests de enlaces.

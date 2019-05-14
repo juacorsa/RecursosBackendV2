@@ -10,6 +10,8 @@ router.get('/', enlacesController.obtenerEnlaces);
 
 router.get('/:id', validateId, enlacesController.obtenerEnlace);
 
+router.get('/tema/:id', validateId, enlacesController.obtenerEnlacesPorTema);
+
 router.post('/', [
 		check('titulo').trim().not().isEmpty().withMessage(Mensaje.TITULO_REQUERIDO),
 		check('url').trim().not().isEmpty().withMessage(Mensaje.URL_REQUERIDA),

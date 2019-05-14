@@ -87,6 +87,41 @@ describe('api/enlaces', function() {
 		});
 	});
 
+	describe('GET /tema/:id', () => {
+		it('devuelve los enlaces de un determinado tema', async () => {			
+			const tema = new Tema({ nombre: generateString() });
+			await tema.save();
+
+			let enlace = new Enlace({
+				titulo: generateString(),
+				url: generateUrl(),
+				observaciones: generateString(),
+				tema: tema
+			});		
+
+			enlace = await enlace.save();			
+		
+			const res = await chai.request(app).get(url + '/tema/' + tema._id);
+
+			expect(enlace).to.not.be.null;
+			expect(res.body).to.be.an('object');			
+			expect(res).to.have.status(HttpStatus.OK);			
+		});
+
+		it('devuelve un error 404 si le pasamos un id de tema que no existe', async () => {
+			const res = await chai.request(app).get(url + '/tema/1');
+
+			expect(res).to.have.status(HttpStatus.NOT_FOUND);						
+		});
+
+		it('devuelve un error 404 si le pasamos un id no válido', async () => {
+			const id  = mongoose.Types.ObjectId();
+			const res = await chai.request(app).get(url + '/tema/' + id);
+
+			expect(res).to.have.status(HttpStatus.NOT_FOUND);						
+		});
+	});
+
 	describe('POST /', () => {	
 		let titulo;
 		let url_enlace;

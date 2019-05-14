@@ -2,6 +2,7 @@ const HttpStatus = require('http-status-codes');
 const { validationResult } = require('express-validator/check');
 
 const Enlace = require('../models/enlace');
+const Tema = require('../models/tema');
 const Mensaje = require('../mensaje');
 
 exports.obtenerEnlaces = async (req, res, next) => { 
@@ -22,6 +23,37 @@ exports.obtenerEnlaces = async (req, res, next) => {
     	next(err);
 	}
 };
+
+exports.obtenerEnlacesPorTema = async (req, res, next) => { 
+	let ordenarPor = 'titulo';
+
+	const id = req.params.id;
+	const tema = await Tema.findById(id);
+
+	if (!tema)
+		return res.status(HttpStatus.NOT_FOUND).json({ msg: Mensaje.TEMA_NO_ENCONTRADO });
+
+	if (req.query.sortBy) {
+		const split = req.query.sortBy.split(':');					
+		ordenarPor = split[1] === 'asc' ? split[0] : '-' + split[0];		
+	}	
+
+	try {
+		const total = await Enlace.find().countDocuments();
+		const enlaces = await Enlace
+			.find()
+			.where('tema._id').equals(id)	
+			.populate('tema')		
+			.sort(ordenarPor);
+
+		res.status(HttpStatus.OK).json({enlaces, total});
+	} 
+	catch(err) {
+		err.statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
+    	next(err);
+	}
+};
+
 
 exports.obtenerEnlace = async (req, res, next) => { 	
 	const enlace = await Enlace.findById(req.params.id);
