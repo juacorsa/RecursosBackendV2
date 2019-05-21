@@ -1,5 +1,8 @@
 # Backend Recursos NodeJS + Express + MongoDB - Versión 2
 
+### Commit 7
+* Se termina el controlador de libros.
+
 ### Commit 6
 * Se terminan los tests de enlaces.
 

@@ -7,11 +7,13 @@ const Mensaje = require('../mensaje');
 
 exports.obtenerEnlaces = async (req, res, next) => { 
 	let ordenarPor = 'titulo';
+
+	const { ordenar } = req.query;
 	
-	if (req.query.sortBy) {
-		const split = req.query.sortBy.split(':');					
-		ordenarPor = split[1] === 'asc' ? split[0] : '-' + split[0];		
-	}	
+	if (ordenar) {
+		const split = ordenar.split(':');					
+		ordenarPor = split[1].toLowerCase() === 'asc' ? split[0] : '-' + split[0];		
+	} 
 
 	try {
 		const total = await Enlace.find().countDocuments();
@@ -27,16 +29,18 @@ exports.obtenerEnlaces = async (req, res, next) => {
 exports.obtenerEnlacesPorTema = async (req, res, next) => { 
 	let ordenarPor = 'titulo';
 
-	const id = req.params.id;
+	const { id } = req.params;
+	const { ordenar } = req.query;
+
 	const tema = await Tema.findById(id);
 
 	if (!tema)
 		return res.status(HttpStatus.NOT_FOUND).json({ msg: Mensaje.TEMA_NO_ENCONTRADO });
 
-	if (req.query.sortBy) {
-		const split = req.query.sortBy.split(':');					
-		ordenarPor = split[1] === 'asc' ? split[0] : '-' + split[0];		
-	}	
+	if (ordenar) {
+		const split = ordenar.split(':');					
+		ordenarPor = split[1].toLowerCase() === 'asc' ? split[0] : '-' + split[0];		
+	} 
 
 	try {
 		const total = await Enlace.find().countDocuments();
@@ -54,9 +58,10 @@ exports.obtenerEnlacesPorTema = async (req, res, next) => {
 	}
 };
 
+exports.obtenerEnlace = async (req, res, next) => { 
+	const { id } = req.params;
 
-exports.obtenerEnlace = async (req, res, next) => { 	
-	const enlace = await Enlace.findById(req.params.id);
+	const enlace = await Enlace.findById(id);
 	
 	try {
 		if (!enlace) 
@@ -75,13 +80,9 @@ exports.registrarEnlace =  async (req, res, next) => {
 	
  	if (!errors.isEmpty()) 
     	return res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({ errors: errors.array() });
-  		
-	const enlace = new Enlace({
-		titulo: req.body.titulo,
-		url: req.body.url,
-		observaciones: req.body.observaciones,
-		tema: req.body.tema
-	});
+
+    const { titulo, url, observaciones, tema } = req.body;  		
+	const enlace = new Enlace({titulo, url, observaciones, tema});
 
 	try {
 		await enlace.save();
@@ -99,13 +100,16 @@ exports.actualizarEnlace = async (req, res, next) => {
  	if (!errors.isEmpty()) 
     	return res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({ errors: errors.array() });
   
+  	const { titulo, url, observaciones, tema } = req.body;  		
+  	const { id } = req.params;
+
   	try {
-	  	const enlace = await Enlace.findByIdAndUpdate(req.params.id,
+	  	const enlace = await Enlace.findByIdAndUpdate(id,
 	    { 
-	      titulo: req.body.titulo,
-	      url   : req.body.url,
-	      tema  : req.body.tema,
-	      observaciones: req.body.observaciones
+	      titulo,
+	      url,
+	      tema,
+	      observaciones
 	    }, { new: true });  		
 
   		if (!enlace) 
@@ -119,8 +123,10 @@ exports.actualizarEnlace = async (req, res, next) => {
 };
 
 exports.borrarEnlace = async (req, res, next) => {
+	const { id } = req.params;
+
 	try {
-		const enlace = await Enlace.findOneAndDelete({_id: req.params.id});  		
+		const enlace = await Enlace.findOneAndDelete({_id: id});  		
 		
 		if (!enlace) 
       		return res.status(HttpStatus.NOT_FOUND).json({ msg: Mensaje.ENLACE_NO_ENCONTRADO });    	

@@ -19,15 +19,19 @@ module.exports = Object.freeze({
 	ENLACE_REGISTRADO         : 'Nuevo enlace registrado con éxito',
 	ENLACE_ACTUALIZADO        : 'Enlace actualizado con éxito',
 	ENLACE_BORRADO            : 'Enlace borrado con éxito',
-
 	TITULO_REQUERIDO 	  	  : 'El título es un campo requerido',
 	URL_FORMATO_INCORRECTO    : 'La url no tiene el formato esperado',
-
 	NOMBRE_REQUERIDO 	  	  : 'El nombre es un campo requerido',
 	NOMBRE_MIN_LENGTH_3 	  : 'El nombre debe tener al menos 3 caracteres',
-	PARAMETRO_ID_INCORRECTO   : 'El parámetro indicado es incorrecto',	
-	
+	PARAMETRO_ID_INCORRECTO   : 'El parámetro indicado es incorrecto',
 	LIBRO_NO_ENCONTRADO	      : 'Libro no encontrado',
+	LIBRO_REGISTRADO          : 'Nuevo libro registrado con éxito',
+	LIBRO_ACTUALIZADO         : 'Libro actualizado con éxito',
+	LIBRO_BORRADO             : 'Libro borrado con éxito',
 	TUTORIAL_NO_ENCONTRADO    : 'Tutorial no encontrado',
-	AÑO_PUBLICACION_NO_VALIDO : 'Año de publiación no válido'
+	TUTORIAL_REGISTRADO       : 'Nuevo tutorial registrado con éxito',
+	TUTORIAL_ACTUALIZADO      : 'Tutorial actualizado con éxito',
+	TUTORIAL_BORRADO          : 'Tutorial borrado con éxito',
+	AÑO_PUBLICACION_NO_VALIDO : 'Año de publiación no válido',
+	PAGINAS_NO_VALIDO 		  : 'Número de páginas no válido'
 });
