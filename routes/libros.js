@@ -8,7 +8,7 @@ const Mensaje = require('../mensaje');
 const Util = require('../util');
 
 const añoActual = Util.getYear();
-const añoMinimo = 2000;
+const añoDesde  = 2000;
 const paginasMinimo = 0;
 
 router.get('/', librosController.obtenerLibros);
@@ -20,7 +20,7 @@ router.post('/', [
 		check('paginas').trim().not().isEmpty().withMessage(Mensaje.PAGINAS_NO_VALIDO),
 		check('paginas').isInt({gt: paginasMinimo}).withMessage(Mensaje.PAGINAS_NO_VALIDO),
 		check('publicado').trim().not().isEmpty().withMessage(Mensaje.AÑO_PUBLICACION_NO_VALIDO),
-		check('publicado').isInt({gt: añoMinimo, lt: añoActual}).withMessage(Mensaje.AÑO_PUBLICACION_NO_VALIDO)
+		check('publicado').isInt({gt: añoDesde, lt: añoActual}).withMessage(Mensaje.AÑO_PUBLICACION_NO_VALIDO)
 	], 
 	librosController.registrarLibro
 );
@@ -30,7 +30,7 @@ router.put('/:id', validateId, [
 		check('paginas').trim().not().isEmpty().withMessage(Mensaje.PAGINAS_NO_VALIDO),
 		check('paginas').isInt({gt: paginasMinimo}).withMessage(Mensaje.PAGINAS_NO_VALIDO),
 		check('publicado').trim().not().isEmpty().withMessage(Mensaje.AÑO_PUBLICACION_NO_VALIDO),
-		check('publicado').isInt({gt: añoMinimo, lt: añoActual}).withMessage(Mensaje.AÑO_PUBLICACION_NO_VALIDO)
+		check('publicado').isInt({gt: añoDesde, lt: añoActual}).withMessage(Mensaje.AÑO_PUBLICACION_NO_VALIDO)
 	], 
 	librosController.actualizarLibro
 );
