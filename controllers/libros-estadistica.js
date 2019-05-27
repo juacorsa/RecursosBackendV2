@@ -15,8 +15,8 @@ exports.obtenerEstadisticaLibros = async (req, res, next) => {
 			match["publicado"] = { "$gte": publicado_desde, "$lte": publicado_hasta };
 		}		
 		if (tema) match["tema"] = { "$eq": tema };
-		if (tema) match["idioma"] = { "$eq": idioma };
-		if (tema) match["editorial"] = { "$eq": editorial };
+		if (idioma) match["idioma"] = { "$eq": idioma };
+		if (editorial) match["editorial"] = { "$eq": editorial };
 
 		query = Libro.aggregate([		    
 		    { $match: match },

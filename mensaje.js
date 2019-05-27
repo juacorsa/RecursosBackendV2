@@ -32,6 +32,7 @@ module.exports = Object.freeze({
 	TUTORIAL_REGISTRADO       : 'Nuevo tutorial registrado con éxito',
 	TUTORIAL_ACTUALIZADO      : 'Tutorial actualizado con éxito',
 	TUTORIAL_BORRADO          : 'Tutorial borrado con éxito',
-	AÑO_PUBLICACION_NO_VALIDO : 'Año de publiación no válido',
+	AÑO_PUBLICACION_NO_VALIDO : 'Año de publicación no válido',
+	DURACION_NO_VALIDA        : 'La duración no es válida',
 	PAGINAS_NO_VALIDO 		  : 'Número de páginas no válido'
 });

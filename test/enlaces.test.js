@@ -269,8 +269,7 @@ describe('api/enlaces', function() {
 			url_enlace    = generateUrl();
 			observaciones = generateString();
 
-			let res = await exec();				
-			
+			let res = await exec();							
 			res = await chai.request(app).delete(url + '/' + res.body.enlace._id);			
 		
 			expect(res).to.have.status(HttpStatus.OK);				
@@ -279,6 +278,4 @@ describe('api/enlaces', function() {
 			expect(res.body).to.have.property('msg').equal(Mensaje.ENLACE_BORRADO);				
 		});
 	});
-
-
 });

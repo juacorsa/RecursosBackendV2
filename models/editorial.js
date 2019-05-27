@@ -5,4 +5,5 @@ const editorialSchema = new Schema({
 	nombre: { type: String, required: true }
 });
 
-module.exports = mongoose.model('Editorial', editorialSchema);
+module.exports = mongoose.model('Editorial', editorialSchema, 'editoriales');
+

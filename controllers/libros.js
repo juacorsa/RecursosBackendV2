@@ -29,9 +29,12 @@ exports.obtenerLibros = async (req, res, next) => {
 		}
 	
 		const libros = await query.exec();
-		const total = libros.length;
+		const total_libros = libros.length;
 
-		res.status(HttpStatus.OK).json({libros, total});
+		let total_paginas = 0;			
+		Object.keys(libros).forEach(i => total_paginas += libros[i].paginas);
+
+		res.status(HttpStatus.OK).json({libros, total_libros, total_paginas});
 	} 
 	catch(err) {
 		err.statusCode = HttpStatus.INTERNAL_SERVER_ERROR;

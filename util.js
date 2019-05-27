@@ -1,10 +1,15 @@
 
 const randomUrl = require('random-url');
-const randomstring = require("randomstring");
+const randomString = require("randomstring");
+const random = require('random');
 
 exports.generateUrl = () => { return randomUrl() + '.com' }
 
-exports.generateString = () => { return randomstring.generate() }
+exports.generateString = () => { return randomString.generate() }
+
+exports.generateYear = () => { return random.int(min = 2010, max = 2019) }
+
+exports.generatePages = () => { return random.int(min = 1, max = 9999) }
 
 exports.getYear = () => { return new Date().getFullYear() }
 
