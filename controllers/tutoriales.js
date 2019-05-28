@@ -86,7 +86,7 @@ exports.actualizarTutorial = async (req, res, next) => {
   	const { titulo, duracion, publicado, observaciones, tema, fabricante, idioma } = req.body;
 
   	try {
-	  	const fabricante = await Tutorial.findByIdAndUpdate(id,
+	  	const tutorial = await Tutorial.findByIdAndUpdate(id,
 	    { 
 	      titulo,
 	      duracion,

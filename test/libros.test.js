@@ -59,7 +59,8 @@ describe('api/libros', function() {
 
 	    	expect(res).to.have.status(HttpStatus.OK);
 	    	expect(res.body).to.be.an('object');
-	    	expect(res.body).to.have.property('total').equal(2);
+	    	expect(res.body).to.have.property('total_libros').equal(2);
+	    	expect(res.body).to.have.property('total_paginas');
 	    	expect(res.body).to.have.property('libros');
 	  	});
 	});
@@ -244,12 +245,108 @@ describe('api/libros', function() {
 		});
 	});
 
+	describe('PUT /:id', () => {	
+		let titulo;		
+		let observaciones;
+		let tema;
+		let idioma;
+		let editorial;
+		let paginas;
+		let publicado;
+		let añoActual = getYear();
+		let añoMinimo = 2000;
 
+		const exec = async () => {
+			return await chai.request(app).put(url + '/' + id).send({ 
+				titulo, 
+				paginas,
+				publicado,				
+				observaciones,
+				editorial,
+				idioma,
+				tema
+			});
+		}		
 
+		beforeEach(async () => {  			
+			await Tema.deleteMany({});
+			await Editorial.deleteMany({});
+			await Idioma.deleteMany({});
 
+			tema = new Tema({ nombre: generateString() });
+			idioma = new Idioma({ nombre: generateString() });
+			editorial = new Editorial({ nombre: generateString() });
 
+			tema = await tema.save();
+			idioma = await idioma.save();
+			editorial = await editorial.save();
 
+			let libro = new Libro({
+				titulo: generateString(),
+				paginas: generatePages(),
+				publicado: getYear(),
+				observaciones: generateString(),
+				tema: tema._id,
+				idioma: idioma._id,
+				editorial: editorial._id
+			});
 
+			libro = await libro.save();
 
+			id = libro._id;				
+    	})
 
+		it('debería devolver un error 422 si el título del libro es vacío', async () => {		
+			titulo = '';						
+			const res = await exec();					
+
+			expect(res).to.have.status(HttpStatus.UNPROCESSABLE_ENTITY);						
+			expect(res.body).to.be.an('object').to.have.property('errors');						
+		});
+
+		it('debería devolver un error 422 si el año de publicación es posterior al actual', async () => {									
+			publicado = añoActual + 1;
+			const res = await exec();			
+			
+			expect(res).to.have.status(HttpStatus.UNPROCESSABLE_ENTITY);			
+			expect(res.body).to.be.an('object').to.have.property('errors');
+		});
+
+		it('debería devolver un error 422 si el año de publicación es anterior al 2000', async () => {									
+			publicado = añoMinimo - 1;
+			const res = await exec();			
+			
+			expect(res).to.have.status(HttpStatus.UNPROCESSABLE_ENTITY);			
+			expect(res.body).to.be.an('object').to.have.property('errors');
+		});	
+
+		it('debería devolver un error 422 si el número de páginas es inferior a cero', async () => {									
+			paginas = -1;
+			const res = await exec();			
+			
+			expect(res).to.have.status(HttpStatus.UNPROCESSABLE_ENTITY);			
+			expect(res.body).to.be.an('object').to.have.property('errors');
+		});				
+
+		it('debería devolver un código de estado 201 si la actualizacion del libro ha sido correcta', async () => {			
+			titulo = generateString();
+			observaciones = generateString();
+			paginas = generatePages();
+			publicado = getYear();
+			tema = await Tema.findOne();
+			idioma = await Idioma.findOne();
+			editorial = await Editorial.findOne();
+
+			const libro = await Libro.findOne();
+			id = libro._id;
+
+			const res = await exec();			
+			
+			expect(res).to.have.status(HttpStatus.OK);	
+			expect(res).to.be.json;		
+			expect(res.body).to.have.property('msg').equal(Mensaje.LIBRO_ACTUALIZADO);	
+			expect(res.body).to.be.an('object').to.have.property('msg');			
+			expect(res.body).to.be.an('object').to.have.property('libro');
+		});
+	});
 });

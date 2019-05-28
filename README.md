@@ -1,5 +1,8 @@
 # Backend Recursos NodeJS + Express + MongoDB - Versión 2
 
+### Commit 10
+* Se completan los tests de libros y tutoriales
+
 ### Commit 9
 * Se termina el controlador de los tutoriales
 
