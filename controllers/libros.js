@@ -1,8 +1,12 @@
 const HttpStatus = require('http-status-codes');
-const { validationResult } = require('express-validator/check');
+const Joi = require('@hapi/joi');
 
 const Libro = require('../models/libro');
 const Mensaje = require('../mensaje');
+const Util = require('../util');
+
+const añoActual = Util.getYear();
+const añoMinimo = 2000;
 
 exports.obtenerLibros = async (req, res, next) => { 
 	const { desde, hasta, tema, idioma, editorial, ordenar } = req.query;
@@ -58,54 +62,72 @@ exports.obtenerLibro = async (req, res, next) => {
 	} 
 };
 
-exports.registrarLibro =  async (req, res, next) => { 
-	const errors = validationResult(req);
-	
- 	if (!errors.isEmpty()) 
-    	return res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({ errors: errors.array() });
-  		
-	const { titulo, paginas, publicado, observaciones, tema, editorial, idioma } = req.body;
-	const libro = new Libro({titulo, paginas, publicado, observaciones, tema, editorial, idioma});
+exports.registrarLibro = async (req, res, next) => { 			
+	const input = {
+		titulo   : req.body.titulo,
+		paginas  : req.body.paginas,
+		publicado: req.body.publicado,
+		tema	 : req.body.tema,
+		editorial: req.body.editorial,
+		idioma   : req.body.idioma
+	}	
 
-	try {
+	Joi.validate(input, schema, async function(error, value) {
+	  if (error) {	    
+	    return res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({msg: error.message})
+	  }
+	  
+	  const { titulo, paginas, publicado, observaciones, tema, editorial, idioma } = req.body;	  
+	  const libro = new Libro({titulo, paginas, publicado, observaciones, tema, editorial, idioma});
+
+	  try {
 		await libro.save();
 		res.status(HttpStatus.CREATED).json({ msg: Mensaje.LIBRO_REGISTRADO, libro });	
 
-	} catch(err) {
-		err.statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
-    	next(err);
-	}	
+		} catch(err) {
+			err.statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
+	    	next(err);
+	  	}
+	});
 };
 
 exports.actualizarLibro = async (req, res, next) => {
-	const errors = validationResult(req);
- 	
- 	if (!errors.isEmpty()) 
-    	return res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({ errors: errors.array() });
-  
-  	const { id } = req.params;
-  	const { titulo, paginas, publicado, observaciones, tema, editorial, idioma } = req.body;
+  	const input = {
+		titulo   : req.body.titulo,
+		paginas  : req.body.paginas,
+		publicado: req.body.publicado,
+		tema	 : req.body.tema,
+		editorial: req.body.editorial,
+		idioma   : req.body.idioma
+	}	
 
-  	try {
+	Joi.validate(input, schema, async function(error, value) {
+	  if (error) {	    
+	    return res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({msg: error.message})
+	  }
+	  
+	  const { titulo, paginas, publicado, observaciones, tema, editorial, idioma } = req.body;	  	  
+	  try {
 	  	const libro = await Libro.findByIdAndUpdate(id,
-	    { 
-	      titulo,
-	      paginas,
-	      publicado,
-	      tema,
-	      idioma,
-	      editorial,
-	      observaciones
-	    }, { new: true });  		
+		{ 
+		      titulo,
+		      paginas,
+		      publicado,
+		      tema,
+		      idioma,
+		      editorial,
+		      observaciones
+		}, { new: true });  		
 
-  		if (!libro) 
-  			return res.status(HttpStatus.NOT_FOUND).json({ msg: Mensaje.LIBRO_NO_ENCONTRADO });
-		
-		res.status(HttpStatus.OK).json({ msg: Mensaje.LIBRO_ACTUALIZADO, libro });
-  	} catch(err) {
-		err.statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
-    	next(err);
-	}	  	
+	  	if (!libro) 
+	  		return res.status(HttpStatus.NOT_FOUND).json({ msg: Mensaje.LIBRO_NO_ENCONTRADO });
+			
+			res.status(HttpStatus.OK).json({ msg: Mensaje.LIBRO_ACTUALIZADO, libro });
+	  	} catch(err) {
+			err.statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
+	    	next(err);
+	  	}	  	
+	});
 };
 
 exports.borrarLibro = async (req, res, next) => {
@@ -123,3 +145,14 @@ exports.borrarLibro = async (req, res, next) => {
     	next(err);
 	} 
 };
+
+const schema = Joi.object().keys({
+	titulo    : Joi.string().required().error(new Error(Mensaje.TITULO_REQUERIDO)),
+	paginas   : Joi.number().integer().required().min(1).error(new Error(Mensaje.PAGINAS_NO_VALIDO)),
+	publicado : Joi.number().integer().required().min(añoMinimo).max(añoActual).error(new Error(Mensaje.AÑO_PUBLICACION_NO_VALIDO)),
+	tema      : Joi.any().required(),
+	idioma    : Joi.any().required(),
+	editorial : Joi.any().required()
+});
+
+

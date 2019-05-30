@@ -1,13 +1,18 @@
 # Backend Recursos NodeJS + Express + MongoDB - Versión 2
 
+### Commit 11
+* Se cambia la estrategia de la validación de los libros.
+* Se instala la librería Joi.
+* Se añaden más tests de libros.
+
 ### Commit 10
-* Se completan los tests de libros y tutoriales
+* Se completan los tests de libros y tutoriales.
 
 ### Commit 9
-* Se termina el controlador de los tutoriales
+* Se termina el controlador de los tutoriales.
 
 ### Commit 8
-* Se termina el controlador de las estadísticas de libros
+* Se termina el controlador de las estadísticas de libros.
 
 ### Commit 7
 * Se termina el controlador de libros.

@@ -15,3 +15,11 @@ exports.generateMinutes = () => { return random.int(min = 1, max = 9999) }
 
 exports.getYear = () => { return new Date().getFullYear() }
 
+exports.isInt = (n) => {
+    return Number(n) === n && n % 1 === 0;
+}
+
+exports.isFloat = (n) => {
+    return Number(n) === n && n % 1 !== 0;
+}
+

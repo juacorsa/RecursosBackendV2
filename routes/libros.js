@@ -15,25 +15,9 @@ router.get('/', librosController.obtenerLibros);
 
 router.get('/:id', validateId, librosController.obtenerLibro);
 
-router.post('/', [
-		check('titulo').trim().not().isEmpty().withMessage(Mensaje.TITULO_REQUERIDO),
-		check('paginas').trim().not().isEmpty().withMessage(Mensaje.PAGINAS_NO_VALIDO),
-		check('paginas').isInt({min: paginasMinimo}).withMessage(Mensaje.PAGINAS_NO_VALIDO),
-		check('publicado').trim().not().isEmpty().withMessage(Mensaje.AÑO_PUBLICACION_NO_VALIDO),
-		check('publicado').isInt({min: añoDesde, max: añoActual}).withMessage(Mensaje.AÑO_PUBLICACION_NO_VALIDO)
-	], 
-	librosController.registrarLibro
-);
+router.post('/', librosController.registrarLibro);
 
-router.put('/:id', validateId, [
-		check('titulo').trim().not().isEmpty().withMessage(Mensaje.TITULO_REQUERIDO),
-		check('paginas').trim().not().isEmpty().withMessage(Mensaje.PAGINAS_NO_VALIDO),
-		check('paginas').isInt({min: paginasMinimo}).withMessage(Mensaje.PAGINAS_NO_VALIDO),
-		check('publicado').trim().not().isEmpty().withMessage(Mensaje.AÑO_PUBLICACION_NO_VALIDO),
-		check('publicado').isInt({min: añoDesde, max: añoActual}).withMessage(Mensaje.AÑO_PUBLICACION_NO_VALIDO)
-	], 
-	librosController.actualizarLibro
-);
+router.put('/:id', validateId, librosController.actualizarLibro);
 
 router.delete('/:id', validateId, librosController.borrarLibro);
 
