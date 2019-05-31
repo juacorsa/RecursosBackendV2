@@ -209,7 +209,7 @@ describe('api/tutoriales', function() {
 			const res = await exec();			
 
 			expect(res).to.have.status(HttpStatus.UNPROCESSABLE_ENTITY);						
-			expect(res.body).to.be.an('object').to.have.property('errors');						
+			expect(res.body).to.have.property('msg').equal(Mensaje.TITULO_REQUERIDO);	
 		});
 
 		it('debería devolver un error 422 si el año de publicación es posterior al actual', async () => {									
@@ -217,7 +217,7 @@ describe('api/tutoriales', function() {
 			const res = await exec();			
 			
 			expect(res).to.have.status(HttpStatus.UNPROCESSABLE_ENTITY);			
-			expect(res.body).to.be.an('object').to.have.property('errors');
+			expect(res.body).to.have.property('msg').equal(Mensaje.AÑO_PUBLICACION_NO_VALIDO);	
 		});
 
 		it('debería devolver un error 422 si el año de publicación es anterior al año mínimo', async () => {									
@@ -225,7 +225,7 @@ describe('api/tutoriales', function() {
 			const res = await exec();			
 			
 			expect(res).to.have.status(HttpStatus.UNPROCESSABLE_ENTITY);			
-			expect(res.body).to.be.an('object').to.have.property('errors');
+			expect(res.body).to.have.property('msg').equal(Mensaje.AÑO_PUBLICACION_NO_VALIDO);	
 		});	
 
 		it('debería devolver un error 422 si la duración del tutorial es inferior a cero', async () => {									
@@ -233,7 +233,7 @@ describe('api/tutoriales', function() {
 			const res = await exec();			
 			
 			expect(res).to.have.status(HttpStatus.UNPROCESSABLE_ENTITY);			
-			expect(res.body).to.be.an('object').to.have.property('errors');
+			expect(res.body).to.have.property('msg').equal(Mensaje.DURACION_NO_VALIDA);	
 		});				
 
 		it('debería devolver un código de estado 201 si el libro se ha registrado correctamente', async () => {			
@@ -279,16 +279,20 @@ describe('api/tutoriales', function() {
 			idioma = new Idioma({ nombre: generateString() });
 			fabricante = new Fabricante({ nombre: generateString() });
 
-			tema = await tema.save();
+			tema   = await tema.save();
 			idioma = await idioma.save();
 			fabricante = await fabricante.save();
+			titulo    = generateString();
+			duracion  = generateMinutes();
+			publicado = generateYear();
+			observaciones = generateString();
 
 			let tutorial = new Tutorial({
 				titulo: generateString(),				
 				publicado: getYear(),
 				duracion: generateMinutes(),
 				observaciones: generateString(),
-				tema: tema._id,
+				tema  : tema._id,
 				idioma: idioma._id,
 				fabricante: fabricante._id
 			});
@@ -302,7 +306,7 @@ describe('api/tutoriales', function() {
 			const res = await exec();			
 
 			expect(res).to.have.status(HttpStatus.UNPROCESSABLE_ENTITY);						
-			expect(res.body).to.be.an('object').to.have.property('errors');						
+			expect(res.body).to.have.property('msg').equal(Mensaje.TITULO_REQUERIDO);						
 		});
 
 		it('debería devolver un error 422 si el año de publicación es posterior al actual', async () => {									
@@ -310,7 +314,7 @@ describe('api/tutoriales', function() {
 			const res = await exec();			
 			
 			expect(res).to.have.status(HttpStatus.UNPROCESSABLE_ENTITY);			
-			expect(res.body).to.be.an('object').to.have.property('errors');
+			expect(res.body).to.have.property('msg').equal(Mensaje.AÑO_PUBLICACION_NO_VALIDO);	
 		});
 
 		it('debería devolver un error 422 si el año de publicación es anterior al año mínimo', async () => {									
@@ -318,7 +322,7 @@ describe('api/tutoriales', function() {
 			const res = await exec();			
 			
 			expect(res).to.have.status(HttpStatus.UNPROCESSABLE_ENTITY);			
-			expect(res.body).to.be.an('object').to.have.property('errors');
+			expect(res.body).to.have.property('msg').equal(Mensaje.AÑO_PUBLICACION_NO_VALIDO);	
 		});	
 
 		it('debería devolver un error 422 si la duración del tutorial es inferior a cero', async () => {									
@@ -326,7 +330,7 @@ describe('api/tutoriales', function() {
 			const res = await exec();			
 			
 			expect(res).to.have.status(HttpStatus.UNPROCESSABLE_ENTITY);			
-			expect(res.body).to.be.an('object').to.have.property('errors');
+			expect(res.body).to.have.property('msg').equal(Mensaje.DURACION_NO_VALIDA);	
 		});				
 
 		it('debería devolver un código de estado 201 si la actualizacion del tutorial ha sido correcta', async () => {			

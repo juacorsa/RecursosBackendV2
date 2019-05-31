@@ -288,6 +288,10 @@ describe('api/libros', function() {
 			tema = await tema.save();
 			idioma = await idioma.save();
 			editorial = await editorial.save();
+			titulo    = generateString();
+			paginas   = generatePages();
+			publicado = generateYear();
+			observaciones = generateString();
 
 			let libro = new Libro({
 				titulo: generateString(),
@@ -309,7 +313,7 @@ describe('api/libros', function() {
 			const res = await exec();					
 
 			expect(res).to.have.status(HttpStatus.UNPROCESSABLE_ENTITY);						
-			expect(res.body).to.be.an('object').to.have.property('msg');						
+			expect(res.body).to.have.property('msg').equal(Mensaje.TITULO_REQUERIDO);							
 		});
 
 		it('debería devolver un error 422 si el año de publicación es posterior al actual', async () => {									
@@ -317,7 +321,7 @@ describe('api/libros', function() {
 			const res = await exec();			
 			
 			expect(res).to.have.status(HttpStatus.UNPROCESSABLE_ENTITY);			
-			expect(res.body).to.be.an('object').to.have.property('msg');
+			expect(res.body).to.have.property('msg').equal(Mensaje.AÑO_PUBLICACION_NO_VALIDO);
 		});
 
 		it('debería devolver un error 422 si el año de publicación es anterior al 2000', async () => {									
@@ -325,7 +329,7 @@ describe('api/libros', function() {
 			const res = await exec();			
 			
 			expect(res).to.have.status(HttpStatus.UNPROCESSABLE_ENTITY);			
-			expect(res.body).to.be.an('object').to.have.property('msg');
+			expect(res.body).to.have.property('msg').equal(Mensaje.AÑO_PUBLICACION_NO_VALIDO);
 		});	
 
 		it('debería devolver un error 422 si el número de páginas es inferior a cero', async () => {									
@@ -333,8 +337,16 @@ describe('api/libros', function() {
 			const res = await exec();			
 			
 			expect(res).to.have.status(HttpStatus.UNPROCESSABLE_ENTITY);			
-			expect(res.body).to.be.an('object').to.have.property('msg');
-		});				
+			expect(res.body).to.have.property('msg').equal(Mensaje.PAGINAS_NO_VALIDO);
+		});	
+
+		it('debería devolver un error 422 si el número de páginas es un valor decimal', async () => {									
+			paginas = 10.99;
+			const res = await exec();			
+			
+			expect(res).to.have.status(HttpStatus.UNPROCESSABLE_ENTITY);			
+			expect(res.body).to.have.property('msg').equal(Mensaje.PAGINAS_NO_VALIDO);
+		});	
 
 		it('debería devolver un código de estado 201 si la actualizacion del libro ha sido correcta', async () => {			
 			titulo = generateString();

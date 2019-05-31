@@ -154,5 +154,3 @@ const schema = Joi.object().keys({
 	idioma    : Joi.any().required(),
 	editorial : Joi.any().required()
 });
-
-

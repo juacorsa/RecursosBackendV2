@@ -1,8 +1,14 @@
 const HttpStatus = require('http-status-codes');
 const { validationResult } = require('express-validator/check');
+const Joi = require('@hapi/joi');
 
 const Tutorial = require('../models/tutorial');
 const Mensaje = require('../mensaje');
+const Util = require('../util');
+
+const añoActual = Util.getYear();
+const añoMinimo  = 2010;
+const duracionMinima = 1;
 
 exports.obtenerTutoriales = async (req, res, next) => { 
 	const { desde, hasta, tema, idioma, fabricante, ordenar } = req.query;
@@ -58,34 +64,53 @@ exports.obtenerTutorial = async (req, res, next) => {
 };
 
 exports.registrarTutorial =  async (req, res, next) => { 
-	const errors = validationResult(req);
-	
- 	if (!errors.isEmpty()) 
-    	return res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({ errors: errors.array() });
-  		
-	const { titulo, duracion, publicado, observaciones, tema, fabricante, idioma } = req.body;
-	const tutorial = new Tutorial({titulo, duracion, publicado, observaciones, tema, fabricante, idioma});
+	const input = {
+		titulo    : req.body.titulo,
+		duracion  : req.body.duracion,
+		publicado : req.body.publicado,
+		tema	  : req.body.tema,
+		fabricante: req.body.fabricante,
+		idioma    : req.body.idioma
+	}	
 
-	try {
+	Joi.validate(input, schema, async function(error, value) {
+	  if (error) {	    
+	    return res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({msg: error.message})
+	  }
+	  
+	  const { titulo, duracion, publicado, observaciones, tema, fabricante, idioma } = req.body;
+	  const tutorial = new Tutorial({titulo, duracion, publicado, observaciones, tema, fabricante, idioma});
+
+	  try {
 		await tutorial.save();
 		res.status(HttpStatus.CREATED).json({ msg: Mensaje.TUTORIAL_REGISTRADO, tutorial });	
 
-	} catch(err) {
-		err.statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
-    	next(err);
-	}	
+		} catch(err) {
+			err.statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
+	    	next(err);
+	  	}
+	  });		
 };
 
 exports.actualizarTutorial = async (req, res, next) => {
-	const errors = validationResult(req);
- 	
- 	if (!errors.isEmpty()) 
-    	return res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({ errors: errors.array() });
-  
-  	const { id } = req.params;
-  	const { titulo, duracion, publicado, observaciones, tema, fabricante, idioma } = req.body;
+	const input = {
+		titulo    : req.body.titulo,
+		duracion  : req.body.duracion,
+		publicado : req.body.publicado,
+		tema	  : req.body.tema,
+		fabricante: req.body.fabricante,
+		idioma    : req.body.idioma
+	}	
 
-  	try {
+	Joi.validate(input, schema, async function(error, value) {
+	  if (error) {	    
+	    return res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({msg: error.message})
+	  }
+
+  	  const { id } = req.params;
+  	  const { titulo, duracion, publicado, observaciones, tema, fabricante, idioma } = req.body;
+
+  	  try {
 	  	const tutorial = await Tutorial.findByIdAndUpdate(id,
 	    { 
 	      titulo,
@@ -101,10 +126,11 @@ exports.actualizarTutorial = async (req, res, next) => {
   			return res.status(HttpStatus.NOT_FOUND).json({ msg: Mensaje.TUTORIAL_NO_ENCONTRADO });
 		
 		res.status(HttpStatus.OK).json({ msg: Mensaje.TUTORIAL_ACTUALIZADO, tutorial });
-  	} catch(err) {
+  	  } catch(err) {
 		err.statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
     	next(err);
-	}	  	
+	  }	  		  
+	});
 };
 
 exports.borrarTutorial = async (req, res, next) => {
@@ -124,3 +150,11 @@ exports.borrarTutorial = async (req, res, next) => {
 };
 
 
+const schema = Joi.object().keys({
+	titulo    : Joi.string().required().error(new Error(Mensaje.TITULO_REQUERIDO)),
+	duracion  : Joi.number().integer().required().min(duracionMinima).error(new Error(Mensaje.DURACION_NO_VALIDA)),
+	publicado : Joi.number().integer().required().min(añoMinimo).max(añoActual).error(new Error(Mensaje.AÑO_PUBLICACION_NO_VALIDO)),
+	tema      : Joi.any().required(),
+	idioma    : Joi.any().required(),
+	fabricante: Joi.any().required()
+});
