@@ -1,6 +1,5 @@
 const HttpStatus = require('http-status-codes');
-const { validationResult } = require('express-validator/check');
-
+const Joi = require('@hapi/joi');
 const Fabricante = require('../models/fabricante');
 const Mensaje = require('../mensaje');
 
@@ -24,7 +23,7 @@ exports.obtenerFabricantes = async (req, res, next) => {
 };
 
 exports.obtenerFabricante = async (req, res, next) => { 
-	const id = req.params.id;
+	const { id } = req.params;
 	const fabricante = await Fabricante.findById(id);
 	
 	try {
@@ -40,48 +39,60 @@ exports.obtenerFabricante = async (req, res, next) => {
 };
 
 exports.registrarFabricante =  async (req, res, next) => { 
-	const nombre = req.body.nombre;
-	const errors = validationResult(req);
- 	
- 	if (!errors.isEmpty()) 
-    	return res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({ errors: errors.array() });
-  		
+	const { nombre } = req.body; 	
+
  	const existe = await Fabricante.findOne({"nombre": new RegExp("^" + nombre + "$", "i") }); 
 	if (existe) 
-		return res.status(HttpStatus.BAD_REQUEST).json({ msg: Mensaje.FABRICANTE_YA_EXISTE });
+		return res.status(HttpStatus.BAD_REQUEST).json({ msg: Mensaje.FABRICANTE_YA_EXISTE });	
 
-	const fabricante = new Fabricante({nombre});
+	const input = { nombre }	
 
-	try {
+	Joi.validate(input, schema, async function(error, value) {
+	  if (error) {	    
+	    return res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({msg: error.message})
+	  }
+	
+	  const fabricante = new Fabricante({nombre});	  
+
+	  try {
 		await fabricante.save();
 		res.status(HttpStatus.CREATED).json({ msg: Mensaje.FABRICANTE_REGISTRADO, fabricante });	
-
-	} catch(err) {
-		err.statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
-    	next(err);
-	}	
+		} catch(err) {
+			err.statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
+	    	next(err);
+	  }
+	});
 };
 
 exports.actualizarFabricante = async (req, res, next) => {
-	const id = req.params.id;
-	const nombre = req.body.nombre;
-	const errors = validationResult(req);
- 	
- 	if (!errors.isEmpty()) 
-    	return res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({ errors: errors.array() });
-  		
+	const { id } = req.params;
+	const { nombre } = req.body;
+
  	const existe = await Fabricante.findOne({"nombre": new RegExp("^" + nombre + "$", "i") }); 
 	if (existe) 
 		return res.status(HttpStatus.BAD_REQUEST).json({ msg: Mensaje.FABRICANTE_YA_EXISTE });
-  
-  	try {
+
+	const input = { nombre }	
+
+	Joi.validate(input, schema, async function(error, value) {
+	  if (error) {	    
+	    return res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({msg: error.message})
+	  }
+	
+	  const fabricante = new Fabricante({nombre});	  
+  	  try {
   		const fabricante = await Fabricante.findByIdAndUpdate(id, { nombre }, { new: true });		
   		if (!fabricante) 
   			return res.status(HttpStatus.NOT_FOUND).json({ msg: Mensaje.FABRICANTE_NO_ENCONTRADO });
 		
 		res.status(HttpStatus.OK).json({ msg: Mensaje.FABRICANTE_ACTUALIZADO, fabricante });
-  	} catch(err) {
+  	  } catch(err) {
 		err.statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
     	next(err);
-	}	  	
+	  }
+	});
 };
+
+const schema = Joi.object().keys({
+	nombre : Joi.string().min(3).required().error(new Error(Mensaje.NOMBRE_REQUERIDO))
+});

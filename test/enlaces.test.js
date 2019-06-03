@@ -151,7 +151,7 @@ describe('api/enlaces', function() {
 			const res = await exec();	
 			
 			expect(res).to.have.status(HttpStatus.UNPROCESSABLE_ENTITY);			
-			expect(res.body).to.be.an('object').to.have.property('errors');						
+			expect(res.body).to.have.property('msg').equal(Mensaje.TITULO_REQUERIDO);	
 		});
 
 		it('debería devolver un error 422 si la url del enlace es vacía', async () => {						
@@ -159,8 +159,16 @@ describe('api/enlaces', function() {
 			const res = await exec();			
 			
 			expect(res).to.have.status(HttpStatus.UNPROCESSABLE_ENTITY);			
-			expect(res.body).to.be.an('object').to.have.property('errors');
+			expect(res.body).to.have.property('msg').equal(Mensaje.URL_FORMATO_INCORRECTO);	
 		});
+
+		it('debería devolver un error 422 si la url del enlace no tiene el formato esperado', async () => {						
+			url_enlace = generateString();
+			const res = await exec();			
+			
+			expect(res).to.have.status(HttpStatus.UNPROCESSABLE_ENTITY);			
+			expect(res.body).to.have.property('msg').equal(Mensaje.URL_FORMATO_INCORRECTO);	
+		});		
 
 		it('debería devolver un código de estado 201 si el registro del enlace es correcto', async () => {			
 			const res = await exec();
@@ -168,7 +176,6 @@ describe('api/enlaces', function() {
 			expect(res).to.have.status(HttpStatus.CREATED);	
 			expect(res).to.be.json;		
 			expect(res.body).to.have.property('msg').equal(Mensaje.ENLACE_REGISTRADO);	
-			expect(res.body).to.be.an('object').to.have.property('msg');			
 			expect(res.body).to.be.an('object').to.have.property('enlace');
 		});
 	});
@@ -203,20 +210,29 @@ describe('api/enlaces', function() {
 
 		it('debería devolver un error 422 si el título del enlace es vacío', async () => {		
 			titulo = '';	
-
 			const res = await exec();	
 			
 			expect(res).to.have.status(HttpStatus.UNPROCESSABLE_ENTITY);			
-			expect(res.body).to.be.an('object').to.have.property('errors');						
+			expect(res.body).to.have.property('msg').equal(Mensaje.TITULO_REQUERIDO);						
 		});
 
 		it('debería devolver un error 422 si la url del enlace es vacía', async () => {						
+			titulo = generateString();
 			url_enlace = '';
 			const res = await exec();			
 			
 			expect(res).to.have.status(HttpStatus.UNPROCESSABLE_ENTITY);			
-			expect(res.body).to.be.an('object').to.have.property('errors');
+			expect(res.body).to.have.property('msg').equal(Mensaje.URL_FORMATO_INCORRECTO);	
 		});
+
+		it('debería devolver un error 422 si la url del enlace no tiene el formato esperado', async () => {						
+			titulo = generateString();
+			url_enlace = generateString();
+			const res = await exec();			
+			
+			expect(res).to.have.status(HttpStatus.UNPROCESSABLE_ENTITY);			
+			expect(res.body).to.have.property('msg').equal(Mensaje.URL_FORMATO_INCORRECTO);	
+		});				
 
 		it('debería devolver un código de estado 201 si la actualizacion del enlace ha sido correcta', async () => {			
 			titulo = generateString();
@@ -231,8 +247,7 @@ describe('api/enlaces', function() {
 			
 			expect(res).to.have.status(HttpStatus.OK);	
 			expect(res).to.be.json;		
-			expect(res.body).to.have.property('msg').equal(Mensaje.ENLACE_ACTUALIZADO);	
-			expect(res.body).to.be.an('object').to.have.property('msg');			
+			expect(res.body).to.have.property('msg').equal(Mensaje.ENLACE_ACTUALIZADO);							
 			expect(res.body).to.be.an('object').to.have.property('enlace');
 		});
 	});

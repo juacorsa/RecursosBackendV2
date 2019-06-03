@@ -1,5 +1,12 @@
 # Backend Recursos NodeJS + Express + MongoDB - Versión 2
 
+### Commit 13
+* Se cambia la estrategia de la validación de las editoriales.
+* Se cambia la estrategia de la validación de los fabricantes.
+* Se cambia la estrategia de la validación de los idiomas.
+* Se cambia la estrategia de la validación de los temas.
+* Se cambia la estrategia de la validación de los enlaces.
+
 ### Commit 12
 * Se cambia la estrategia de la validación de los tutoriales.
 

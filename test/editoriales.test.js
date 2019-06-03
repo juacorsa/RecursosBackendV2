@@ -4,6 +4,7 @@ const chai = require('chai');
 const expect = require('chai').expect;
 const Editorial = require('../models/editorial');
 const Mensaje = require('../mensaje');
+const { generateString } = require('../util');
 
 chai.use(require('chai-http'));
 
@@ -20,8 +21,8 @@ describe('api/editoriales', function() {
 			await Editorial.deleteMany({});	
 
 			Editorial.collection.insertMany([
-				{ nombre: 'editorial1' },
-				{ nombre: 'editorial2' }
+				{ nombre: generateString() },
+				{ nombre: generateString() }
 			]);
 
 			const res = await chai.request(app).get(url);
@@ -35,7 +36,7 @@ describe('api/editoriales', function() {
 
 	describe('GET /:id', () => {
 		it('devuelve una editorial si le pasamos un id válido', async () => {
-			const editorial = new Editorial({ nombre: 'editorial1' });
+			const editorial = new Editorial({ nombre: generateString() });
 			await editorial.save();			
 			
 			const res = await chai.request(app).get(url + editorial._id);
@@ -69,7 +70,7 @@ describe('api/editoriales', function() {
 		}		
 
 		beforeEach(() => {      		
-      		nombre = 'editorial1'; 
+      		nombre = generateString()
     	})
 
 		it('devuelve un error 422 si el nombre de la editorial es inferior a 3 caracteres', async () => {
@@ -77,7 +78,7 @@ describe('api/editoriales', function() {
 			const res = await exec();
 			
 			expect(res).to.have.status(HttpStatus.UNPROCESSABLE_ENTITY);			
-			expect(res.body).to.be.an('object').to.have.property('errors');
+			expect(res.body).to.have.property('msg').equal(Mensaje.NOMBRE_REQUERIDO);
 		});
 
 		it('devuelve un error 422 si el nombre de la editorial es vacía', async () => {
@@ -85,7 +86,7 @@ describe('api/editoriales', function() {
 			const res = await exec();
 			
 			expect(res).to.have.status(HttpStatus.UNPROCESSABLE_ENTITY);			
-			expect(res.body).to.be.an('object').to.have.property('errors');
+			expect(res.body).to.have.property('msg').equal(Mensaje.NOMBRE_REQUERIDO);
 		});
 
 		it('devuelve un estado 201 si el registro de la editorial es correcto', async () => {			
@@ -93,8 +94,7 @@ describe('api/editoriales', function() {
 			
 			expect(res).to.have.status(HttpStatus.CREATED);	
 			expect(res).to.be.json;		
-			expect(res.body).to.have.property('msg').equal(Mensaje.EDITORIAL_REGISTRADA);	
-			expect(res.body).to.be.an('object').to.have.property('msg');			
+			expect(res.body).to.have.property('msg').equal(Mensaje.EDITORIAL_REGISTRADA);							
 			expect(res.body).to.be.an('object').to.have.property('editorial');
 		});
 
@@ -129,7 +129,7 @@ describe('api/editoriales', function() {
 			const res = await exec();
 			
 			expect(res).to.have.status(HttpStatus.UNPROCESSABLE_ENTITY);			
-			expect(res.body).to.be.an('object').to.have.property('errors');			
+			expect(res.body).to.have.property('msg').equal(Mensaje.NOMBRE_REQUERIDO);			
 		});
 
 		it('devuelve un error 422 si el nombre de la editorial es vacío', async () => {
@@ -137,7 +137,7 @@ describe('api/editoriales', function() {
 			const res = await exec();
 			
 			expect(res).to.have.status(HttpStatus.UNPROCESSABLE_ENTITY);			
-			expect(res.body).to.be.an('object').to.have.property('errors');
+			expect(res.body).to.have.property('msg').equal(Mensaje.NOMBRE_REQUERIDO);
 		});
 
 		it('devuelve un estado 200 si el registro de la editorial es correcto', async () => {			
@@ -147,7 +147,6 @@ describe('api/editoriales', function() {
 			expect(res).to.have.status(HttpStatus.OK);	
 			expect(res).to.be.json;		
 			expect(res.body).to.have.property('msg').equal(Mensaje.EDITORIAL_ACTUALIZADA);	
-			expect(res.body).to.be.an('object').to.have.property('msg');
 			expect(res.body).to.be.an('object').to.have.property('editorial');
 		});
 

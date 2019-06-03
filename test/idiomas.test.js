@@ -4,6 +4,7 @@ const chai = require('chai');
 const expect  = require('chai').expect;
 const Idioma  = require('../models/idioma');
 const Mensaje = require('../mensaje');
+const { generateString } = require('../util');
 
 chai.use(require('chai-http'));
 
@@ -69,7 +70,7 @@ describe('api/idiomas', function() {
 		}		
 
 		beforeEach(() => {      		
-      		nombre = 'idioma1'; 
+      		nombre = generateString() 
     	})
 
 		it('devuelve un error 422 si el nombre del idioma es inferior a 3 caracteres', async () => {
@@ -77,7 +78,7 @@ describe('api/idiomas', function() {
 			const res = await exec();
 			
 			expect(res).to.have.status(HttpStatus.UNPROCESSABLE_ENTITY);			
-			expect(res.body).to.be.an('object').to.have.property('errors');
+			expect(res.body).to.have.property('msg').equal(Mensaje.NOMBRE_REQUERIDO);	
 		});
 
 		it('devuelve un error 422 si el nombre del idioma es vacío', async () => {
@@ -85,7 +86,7 @@ describe('api/idiomas', function() {
 			const res = await exec();
 			
 			expect(res).to.have.status(HttpStatus.UNPROCESSABLE_ENTITY);			
-			expect(res.body).to.be.an('object').to.have.property('errors');
+			expect(res.body).to.have.property('msg').equal(Mensaje.NOMBRE_REQUERIDO);	
 		});
 
 		it('devuelve un estado 201 si el registro del idioma es correcto', async () => {			
@@ -94,7 +95,6 @@ describe('api/idiomas', function() {
 			expect(res).to.have.status(HttpStatus.CREATED);	
 			expect(res).to.be.json;		
 			expect(res.body).to.have.property('msg').equal(Mensaje.IDIOMA_REGISTRADO);	
-			expect(res.body).to.be.an('object').to.have.property('msg');			
 			expect(res.body).to.be.an('object').to.have.property('idioma');
 		});
 
@@ -129,7 +129,7 @@ describe('api/idiomas', function() {
 			const res = await exec();
 			
 			expect(res).to.have.status(HttpStatus.UNPROCESSABLE_ENTITY);			
-			expect(res.body).to.be.an('object').to.have.property('errors');			
+			expect(res.body).to.have.property('msg').equal(Mensaje.NOMBRE_REQUERIDO);			
 		});
 
 		it('devuelve un error 422 si el nombre del idioma es vacío', async () => {
@@ -137,7 +137,7 @@ describe('api/idiomas', function() {
 			const res = await exec();
 			
 			expect(res).to.have.status(HttpStatus.UNPROCESSABLE_ENTITY);			
-			expect(res.body).to.be.an('object').to.have.property('errors');
+			expect(res.body).to.have.property('msg').equal(Mensaje.NOMBRE_REQUERIDO);	
 		});
 
 		it('devuelve un estado 200 si el registro del idioma es correcto', async () => {			
@@ -146,8 +146,7 @@ describe('api/idiomas', function() {
 			
 			expect(res).to.have.status(HttpStatus.OK);	
 			expect(res).to.be.json;		
-			expect(res.body).to.have.property('msg').equal(Mensaje.IDIOMA_ACTUALIZADO);	
-			expect(res.body).to.be.an('object').to.have.property('msg');
+			expect(res.body).to.have.property('msg').equal(Mensaje.IDIOMA_ACTUALIZADO);				
 			expect(res.body).to.be.an('object').to.have.property('idioma');
 		});
 

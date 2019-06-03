@@ -1,6 +1,5 @@
 const HttpStatus = require('http-status-codes');
-const { validationResult } = require('express-validator/check');
-
+const Joi = require('@hapi/joi');
 const Editorial = require('../models/editorial');
 const Mensaje = require('../mensaje');
 
@@ -24,7 +23,7 @@ exports.obtenerEditoriales = async (req, res, next) => {
 };
 
 exports.obtenerEditorial = async (req, res, next) => { 
-	const id = req.params.id;
+	const { id } = req.params;
 	const editorial = await Editorial.findById(id);
 	
 	try {
@@ -39,49 +38,61 @@ exports.obtenerEditorial = async (req, res, next) => {
 	} 
 };
 
-exports.registrarEditorial =  async (req, res, next) => { 
-	const nombre = req.body.nombre;
-	const errors = validationResult(req);
- 	
- 	if (!errors.isEmpty()) 
-    	return res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({ errors: errors.array() });
-  		
+exports.registrarEditorial =  async (req, res, next) => { 	
+	const { nombre } = req.body; 	
+
  	const existe = await Editorial.findOne({"nombre": new RegExp("^" + nombre + "$", "i") }); 
 	if (existe) 
-		return res.status(HttpStatus.BAD_REQUEST).json({ msg: Mensaje.EDITORIAL_YA_EXISTE });
+		return res.status(HttpStatus.BAD_REQUEST).json({ msg: Mensaje.EDITORIAL_YA_EXISTE });	
 
-	const editorial = new Editorial({nombre});
+	const input = { nombre }	
 
-	try {
+	Joi.validate(input, schema, async function(error, value) {
+	  if (error) {	    
+	    return res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({msg: error.message})
+	  }
+	
+	  const editorial = new Editorial({nombre});	  
+
+	  try {
 		await editorial.save();
 		res.status(HttpStatus.CREATED).json({ msg: Mensaje.EDITORIAL_REGISTRADA, editorial });	
 
-	} catch(err) {
-		err.statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
-    	next(err);
-	}	
+		} catch(err) {
+			err.statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
+	    	next(err);
+	  	}
+	  });		
 };
 
 exports.actualizarEditorial = async (req, res, next) => {
-	const id = req.params.id;
-	const nombre = req.body.nombre;
-	const errors = validationResult(req);
- 	
- 	if (!errors.isEmpty()) 
-    	return res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({ errors: errors.array() });
+	const { id } = req.params;	
+	const { nombre } = req.body;
   		
  	const existe = await Editorial.findOne({"nombre": new RegExp("^" + nombre + "$", "i") }); 
 	if (existe) 
 		return res.status(HttpStatus.BAD_REQUEST).json({ msg: Mensaje.EDITORIAL_YA_EXISTE });
   
-  	try {
+	const input = { nombre }	
+
+	Joi.validate(input, schema, async function(error, value) {
+	  if (error) {	    
+	    return res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({msg: error.message})
+	  }	
+	  	  
+  	  try {
   		const editorial = await Editorial.findByIdAndUpdate(id, { nombre }, { new: true });		
   		if (!editorial) 
   			return res.status(HttpStatus.NOT_FOUND).json({ msg: Mensaje.EDITORIAL_NO_ENCONTRADA });
 		
 		res.status(HttpStatus.OK).json({ msg: Mensaje.EDITORIAL_ACTUALIZADA, editorial });
-  	} catch(err) {
+  	  } catch(err) {
 		err.statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
     	next(err);
-	}	  	
-};
+	 }	  	
+	});
+}
+
+const schema = Joi.object().keys({
+	nombre : Joi.string().min(3).required().error(new Error(Mensaje.NOMBRE_REQUERIDO))
+});

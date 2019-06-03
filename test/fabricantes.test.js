@@ -78,7 +78,7 @@ describe('api/fabricantes', function() {
 			const res = await exec();
 			
 			expect(res).to.have.status(HttpStatus.UNPROCESSABLE_ENTITY);			
-			expect(res.body).to.be.an('object').to.have.property('errors');
+			expect(res.body).to.have.property('msg').equal(Mensaje.NOMBRE_REQUERIDO);	
 		});
 
 		it('devuelve un error 422 si el nombre del fabricante es vacío', async () => {
@@ -86,7 +86,7 @@ describe('api/fabricantes', function() {
 			const res = await exec();
 			
 			expect(res).to.have.status(HttpStatus.UNPROCESSABLE_ENTITY);			
-			expect(res.body).to.be.an('object').to.have.property('errors');
+			expect(res.body).to.have.property('msg').equal(Mensaje.NOMBRE_REQUERIDO);	
 		});
 
 		it('devuelve un estado 201 si el registro del fabricante es correcto', async () => {			
@@ -130,7 +130,7 @@ describe('api/fabricantes', function() {
 			const res = await exec();
 			
 			expect(res).to.have.status(HttpStatus.UNPROCESSABLE_ENTITY);			
-			expect(res.body).to.be.an('object').to.have.property('errors');			
+			expect(res.body).to.have.property('msg').equal(Mensaje.NOMBRE_REQUERIDO);			
 		});
 
 		it('devuelve un error 422 si el nombre del fabricante es vacío', async () => {
@@ -138,7 +138,7 @@ describe('api/fabricantes', function() {
 			const res = await exec();
 			
 			expect(res).to.have.status(HttpStatus.UNPROCESSABLE_ENTITY);			
-			expect(res.body).to.be.an('object').to.have.property('errors');
+			expect(res.body).to.have.property('msg').equal(Mensaje.NOMBRE_REQUERIDO);	
 		});
 
 		it('devuelve un estado 200 si el registro del fabricante es correcto', async () => {			
@@ -147,8 +147,7 @@ describe('api/fabricantes', function() {
 			
 			expect(res).to.have.status(HttpStatus.OK);	
 			expect(res).to.be.json;		
-			expect(res.body).to.have.property('msg').equal(Mensaje.FABRICANTE_ACTUALIZADO);	
-			expect(res.body).to.be.an('object').to.have.property('msg');
+			expect(res.body).to.have.property('msg').equal(Mensaje.FABRICANTE_ACTUALIZADO);				
 			expect(res.body).to.be.an('object').to.have.property('fabricante');
 		});
 

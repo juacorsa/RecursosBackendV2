@@ -1,6 +1,4 @@
 const HttpStatus = require('http-status-codes');
-const { validationResult } = require('express-validator/check');
-
 const Libro = require('../models/libro');
 
 exports.obtenerEstadisticaLibros = async (req, res, next) => { 	

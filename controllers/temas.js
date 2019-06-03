@@ -1,6 +1,5 @@
 const HttpStatus = require('http-status-codes');
-const { validationResult } = require('express-validator/check');
-
+const Joi = require('@hapi/joi');
 const Tema = require('../models/tema');
 const Mensaje = require('../mensaje');
 
@@ -24,7 +23,7 @@ exports.obtenerTemas = async (req, res, next) => {
 };
 
 exports.obtenerTema = async (req, res, next) => { 
-	const id = req.params.id;
+	const { id } = req.params;
 	const tema = await Tema.findById(id);
 	
 	try {
@@ -39,50 +38,61 @@ exports.obtenerTema = async (req, res, next) => {
 	} 
 };
 
-exports.registrarTema =  async (req, res, next) => { 
-	const nombre = req.body.nombre;
-	const errors = validationResult(req);
- 	
- 	if (!errors.isEmpty()) 
-    	return res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({ errors: errors.array() });
-  		
+exports.registrarTema =  async (req, res, next) => { 	
+	const { nombre } = req.body; 	
+
  	const existe = await Tema.findOne({"nombre": new RegExp("^" + nombre + "$", "i") }); 
 	if (existe) 
-		return res.status(HttpStatus.BAD_REQUEST).json({ msg: Mensaje.TEMA_YA_EXISTE });
+		return res.status(HttpStatus.BAD_REQUEST).json({ msg: Mensaje.TEMA_YA_EXISTE });	
 
-	const tema = new Tema({ nombre: nombre });
+	const input = { nombre }	
 
-	try {
+	Joi.validate(input, schema, async function(error, value) {
+	  if (error) {	    
+	    return res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({msg: error.message})
+	  }
+	
+	  const tema = new Tema({nombre});	  
+
+	  try {
 		await tema.save();
 		res.status(HttpStatus.CREATED).json({ msg: Mensaje.TEMA_REGISTRADO, tema });	
 
-	} catch(err) {
-		err.statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
-    	next(err);
-	}	
+		} catch(err) {
+			err.statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
+	    	next(err);
+	  	}
+	  });		
 };
 
 exports.actualizarTema = async (req, res, next) => {
-	const id = req.params.id;
-	const nombre = req.body.nombre;
-	const errors = validationResult(req);
- 	
- 	if (!errors.isEmpty()) 
-    	return res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({ errors: errors.array() });
+	const { id } = req.params;	
+	const { nombre } = req.body;
   		
  	const existe = await Tema.findOne({"nombre": new RegExp("^" + nombre + "$", "i") }); 
 	if (existe) 
 		return res.status(HttpStatus.BAD_REQUEST).json({ msg: Mensaje.TEMA_YA_EXISTE });
   
-  	try {
+	const input = { nombre }	
+
+	Joi.validate(input, schema, async function(error, value) {
+	  if (error) {	    
+	    return res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({msg: error.message})
+	  }	
+	  	  
+  	  try {
   		const tema = await Tema.findByIdAndUpdate(id, { nombre }, { new: true });		
   		if (!tema) 
   			return res.status(HttpStatus.NOT_FOUND).json({ msg: Mensaje.TEMA_NO_ENCONTRADO });
 		
 		res.status(HttpStatus.OK).json({ msg: Mensaje.TEMA_ACTUALIZADO, tema });
-  	} catch(err) {
+  	  } catch(err) {
 		err.statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
     	next(err);
-	}	  	
-};
+	 }	  	
+	});
+}
 
+const schema = Joi.object().keys({
+	nombre : Joi.string().min(3).required().error(new Error(Mensaje.NOMBRE_REQUERIDO)),
+});

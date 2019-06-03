@@ -1,6 +1,5 @@
 const HttpStatus = require('http-status-codes');
-const { validationResult } = require('express-validator/check');
-
+const Joi = require('@hapi/joi');
 const Enlace = require('../models/enlace');
 const Tema = require('../models/tema');
 const Mensaje = require('../mensaje');
@@ -75,35 +74,49 @@ exports.obtenerEnlace = async (req, res, next) => {
 	} 
 };
 
-exports.registrarEnlace =  async (req, res, next) => { 
-	const errors = validationResult(req);
+exports.registrarEnlace =  async (req, res, next) => { 	
+	const input = { 
+		titulo: req.body.titulo,
+		url: req.body.url 
+	}	
+
+	Joi.validate(input, schema, async function(error, value) {
+	  if (error) {	    
+	    return res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({msg: error.message})
+	  }
 	
- 	if (!errors.isEmpty()) 
-    	return res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({ errors: errors.array() });
+      const { titulo, url, observaciones, tema } = req.body;  		
+	  const enlace = new Enlace({titulo, url, observaciones, tema});
 
-    const { titulo, url, observaciones, tema } = req.body;  		
-	const enlace = new Enlace({titulo, url, observaciones, tema});
-
-	try {
+	  try {
 		await enlace.save();
 		res.status(HttpStatus.CREATED).json({ msg: Mensaje.ENLACE_REGISTRADO, enlace });	
 
-	} catch(err) {
+	  } catch(err) {
 		err.statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
     	next(err);
-	}	
+	  }	
+	  });	
+
+
 };
 
-exports.actualizarEnlace = async (req, res, next) => {
-	const errors = validationResult(req);
- 	
- 	if (!errors.isEmpty()) 
-    	return res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({ errors: errors.array() });
-  
-  	const { titulo, url, observaciones, tema } = req.body;  		
-  	const { id } = req.params;
+exports.actualizarEnlace = async (req, res, next) => {  
+	const input = { 
+		titulo: req.body.titulo,
+		url: req.body.url 
+	}	
+  	
+	Joi.validate(input, schema, async function(error, value) {
+	  if (error) {	    
+	    return res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({msg: error.message})
+	  }
+	
+      const { id } = req.params;
+      const { titulo, url, observaciones, tema } = req.body;  		
+	  const enlace = new Enlace({titulo, url, observaciones, tema});
 
-  	try {
+  	  try {
 	  	const enlace = await Enlace.findByIdAndUpdate(id,
 	    { 
 	      titulo,
@@ -113,14 +126,16 @@ exports.actualizarEnlace = async (req, res, next) => {
 	    }, { new: true });  		
 
   		if (!enlace) 
-  			return res.status(HttpStatus.NOT_FOUND).json({ msg: Mensaje.ENLACE_NO_ENCONTRADO });
+  			return res.status(HttpStatus.NOT_FOUND).json({ msg: Mensaje.ENLACE_NO_ENCONTRADO });		
 		
 		res.status(HttpStatus.OK).json({ msg: Mensaje.ENLACE_ACTUALIZADO, enlace });
-  	} catch(err) {
-		err.statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
-    	next(err);
-	}	  	
+  	    } catch(err) {
+			err.statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
+    		next(err);
+	    }		
+	});	
 };
+
 
 exports.borrarEnlace = async (req, res, next) => {
 	const { id } = req.params;
@@ -138,3 +153,8 @@ exports.borrarEnlace = async (req, res, next) => {
     	next(err);
 	} 
 };
+
+const schema = Joi.object().keys({
+	titulo : Joi.string().required().error(new Error(Mensaje.TITULO_REQUERIDO)),
+	url : Joi.string().required().uri().error(new Error(Mensaje.URL_FORMATO_INCORRECTO))
+});
