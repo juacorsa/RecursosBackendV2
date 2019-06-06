@@ -6,6 +6,7 @@ const enlaces = require('../routes/enlaces');
 const libros = require('../routes/libros');
 const tutoriales = require('../routes/tutoriales');
 const libros_estadistica = require('../routes/libros_estadistica');
+const tutoriales_estadistica = require('../routes/tutoriales_estadistica');
 
 module.exports = function(app) {	
 	app.use('/api/temas', temas);
@@ -16,4 +17,5 @@ module.exports = function(app) {
 	app.use('/api/libros', libros);	
 	app.use('/api/tutoriales', tutoriales);	
 	app.use('/api/estadistica/libros', libros_estadistica);
+	app.use('/api/estadistica/tutoriales', tutoriales_estadistica);
 }

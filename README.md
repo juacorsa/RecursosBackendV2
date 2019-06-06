@@ -1,5 +1,9 @@
 # Backend Recursos NodeJS + Express + MongoDB - Versión 2
 
+### Commit 14
+* Se termina el controlador de las estadísticas de tutoriales.
+* Se generan los seeds de idiomas, temas, fabricantes y editoriales.
+
 ### Commit 13
 * Se cambia la estrategia de la validación de las editoriales.
 * Se cambia la estrategia de la validación de los fabricantes.
